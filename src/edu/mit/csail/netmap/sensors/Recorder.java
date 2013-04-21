@@ -28,7 +28,7 @@ public class Recorder {
   
   /** User-Agent header used during uploading. */
   private static final String USER_AGENT = "NetMap/1.0 Recorder/1.0";
-  
+
   /** Logging tag. */
   private static final String TAG = "recorder";
   
@@ -44,42 +44,44 @@ public class Recorder {
   /** Message digest cloned for each reading. */
   private static MessageDigest digestPrototype_ = null;
   
+  /** Encoding used when computing the crypto-hash of a sensor reading. */
+  private static Charset digestCharset_ = null;
+  
   /**
    * Adds a sensor reading to the transmission queue.
    * 
-   * @param jsonData the reading's information, packed as a JSON string
-   * @return a crypto hash of the reading 
+   * @param jsonData the reading's information, encoded as a JSON string
+   * @return a cryptographic hash of the reading 
    */
-  public static String storeReading(String jsonData) {
+  public static final String storeReading(String jsonData) {
     String digest = Recorder.digest(jsonData);
-    insertReading(jsonData);  
+    insertReading(jsonData);
     return digest;
   }
   
   /**
    * 
-   * 
-   * @param uploadUri {@link URI} for the HTTP backend that receives sensor data
+   *
    * @return if true, the caller should call {@link #sendPack(URI)} again to
    *     upload more data 
    */
-  public static boolean sendPack(URI uploadUri) {
+  public static final boolean uploadReadingPack() {
     StringBuffer packData = new StringBuffer();
     long lastReadingId = readPack(packData, PACK_SIZE);
     if (lastReadingId == 0) {
       // No stored readings.
       return false;
     }
-    if (!uploadPack(packData.toString(), uploadUri)) {
+    if (!uploadPackData(packData.toString(), Config.getReadingsUploadUri())) {
       // The data upload failed.
       return true;
     }
     deletePack(lastReadingId);
     return true;
   }
-
+  
   /** Called by {@link Sensors#initialize(android.content.Context)}. */
-  public static void initialize(Context context) {
+  public static final void initialize(Context context) {
     context_ = context;
     
     DatabaseOpenHelper databaseOpenHelper = new DatabaseOpenHelper(context);    
@@ -90,10 +92,11 @@ public class Recorder {
     } catch (NoSuchAlgorithmException e) {
       Log.e(TAG, "Device does not support SHA-1");
     }
+    digestCharset_ = Charset.defaultCharset();
   }
   
   /**
-   * Fetches sensor readings from the database, so they can be uploaded.
+   * Fetches queued sensor readings from the database, so they can be uploaded.
    * 
    * @param packData {@link StringBuffer} that receives readings, in a format
    *     suitable for server consumption
@@ -103,6 +106,9 @@ public class Recorder {
   private static final long readPack(StringBuffer packData, int packSize) {
     long lastReadingId = 0;  // INTEGER PRIMARY KEY values start at 1
     int limit = 100;
+    
+    // The size guideline only applies to the data that we add in this call.
+    packSize += packData.length();
     
     while (true) {
       final Cursor cursor = db_.rawQuery("SELECT id, json FROM " + TABLE_NAME +
@@ -133,13 +139,14 @@ public class Recorder {
   }
   
   /**
-   * Uploads a pack of sensor readings data to the server.
+   * Uploads an already-assembled pack of sensor readings data to the server.
    * 
-   * @param packData 
+   * @param packData the sensor readings data to be uploaded; this should be
+   *     prepared by {@link #readPack(StringBuffer, int)}
    * @param uploadUri {@link URI} for the HTTP backend that receives sensor data
-   * @return
+   * @return true if the upload operation succeeded, false if an error occurred
    */
-  private static final boolean uploadPack(String packData, URI uploadUri) {
+  private static final boolean uploadPackData(String packData, URI uploadUri) {
     HttpPost request = new HttpPost(uploadUri);
     try {
       request.setEntity(new StringEntity(packData));
@@ -161,7 +168,7 @@ public class Recorder {
   }
   
   /**
-   * Removes sensor readings that were uploaded from the database.
+   * Removes successfully uploaded sensor readings from the database.
    * 
    * This method permanently removes the readings from the local database, so it
    * should only be called 
@@ -193,7 +200,7 @@ public class Recorder {
   /**
    * 
    * 
-   * @param jsonData the reading's information, packed as a JSON string
+   * @param jsonData the reading's information, encoded as a JSON string
    */
   private static final void insertReading(String jsonData) {
     ContentValues values = new ContentValues();
@@ -204,7 +211,7 @@ public class Recorder {
   /**
    * Computes a cryptographically secure hash of a reading's data.
    * 
-   * @param jsonData the reading's information, packed as JSON string
+   * @param jsonData the reading's information, encoded as JSON string
    * @return a small string that uniquely identifies this reading
    */
   private static final String digest(String jsonData) {
@@ -219,7 +226,7 @@ public class Recorder {
         return null;
       }
     }
-    byte[] digestBytes = digest.digest(jsonData.getBytes(Charset.defaultCharset()));
+    byte[] digestBytes = digest.digest(jsonData.getBytes(digestCharset_));
     StringBuffer hexDigest = new StringBuffer();
     for (byte b : digestBytes) {
       String hexByte = Integer.toHexString(b);
@@ -232,7 +239,7 @@ public class Recorder {
   }  
 
   /** Opens the readings database and creates its schema. */
-  private static class DatabaseOpenHelper extends SQLiteOpenHelper {
+  private static final class DatabaseOpenHelper extends SQLiteOpenHelper {
     public DatabaseOpenHelper(Context context) {
       super(context, "metrics", null, 1);
     }

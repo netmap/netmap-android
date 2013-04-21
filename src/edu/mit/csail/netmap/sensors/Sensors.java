@@ -18,7 +18,27 @@ public class Sensors {
     if (initialized) return;
     initialized = true;
         
+    // Config goes first, so every other module can use it right away.
+    Config.initialize(context);
+    // Recorder goes right after config, so the actual sensors can use it.
+    Recorder.initialize(context);
+    
+    // Sensors get initialized here.
     Gps.initialize(context);
   }
   private static boolean initialized = false;
+  
+  /**
+   * Collect the sensor reading data that will be stored in the database. 
+   * 
+   * @param jsonData {@link StringBuffer} that receives the reading data,
+   *     formatted as a JSON string
+   */
+  public static void readSensors(StringBuffer jsonData) {
+    jsonData.append("{\"config\":");
+    Config.getJson(jsonData);
+    jsonData.append(",\"gps\":");
+    Gps.getJson(jsonData);
+    jsonData.append("}");
+  }
 }

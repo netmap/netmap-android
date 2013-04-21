@@ -26,8 +26,10 @@ public class GameActivity extends Activity {
     setupChromeView(chromeView);
 
     // TODO(pwnall): deploy a production server and use that URL
+    //chromeView.loadUrl("http://netmap.pwnb.us");
     // chromeView.loadUrl("http://192.168.10.73:9200");
-    chromeView.loadUrl("http://192.168.10.73:9200/dev_mode");
+    // chromeView.loadUrl("http://192.168.10.73:9200/dev_mode");
+    chromeView.loadUrl("http://128.30.5.34:9200/dev_mode");
   }
   
   @Override
@@ -65,7 +67,8 @@ public class GameActivity extends Activity {
     settings.setSupportZoom(false);
     settings.setUserAgentString(settings.getUserAgentString() + " NetMap/1.0");
     
-    chromeView.addJavascriptInterface(new JsBindings(), "NetMap");
+    // The JavaScript maps _NetMapPil to NetMap.Pil
+    chromeView.addJavascriptInterface(new JsBindings(), "_NetMapPil");
   }
   
   @Override

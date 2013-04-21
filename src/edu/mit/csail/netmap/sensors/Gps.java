@@ -112,8 +112,11 @@ public class Gps {
       buffer.append(",\"unavailable\": true");
     }
     if (gpsStatus != null) {
-      buffer.append(",\"timeToFixMs\":");
-      buffer.append(gpsStatus.getTimeToFirstFix());
+      buffer.append(",\"timeToFix\":");
+      int timeToFixMs = gpsStatus.getTimeToFirstFix();
+      buffer.append(timeToFixMs / 1000);
+      buffer.append('.');
+      buffer.append(String.format("%03d", timeToFixMs % 1000));
       buffer.append(",\"satellites\":[");
       boolean firstElement = true;
       for (GpsSatellite satellite : gpsStatus.getSatellites()) {
