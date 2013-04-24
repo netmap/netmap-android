@@ -1,13 +1,17 @@
 package edu.mit.csail.netmap.sensors;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -156,8 +160,23 @@ public class Recorder {
     }
     HttpClient httpClient = AndroidHttpClient.newInstance(USER_AGENT, context_);
     try {
-      httpClient.execute(request);
-      return true;
+      HttpResponse response = httpClient.execute(request);
+      int statusCode = response.getStatusLine().getStatusCode();
+      if (statusCode >= 200 && statusCode < 300) {
+        response.getEntity().consumeContent();
+        return true;
+      }
+      // TODO(pwnall): invalid JSON should be removed from the database,
+      //               otherwise there will be an infinite loop
+      
+      HttpEntity entity = response.getEntity();
+      InputStream content = entity.getContent();
+      Scanner scanner = new Scanner(content).useDelimiter("\\A");
+      Log.e(TAG, "Server error during pack upload: " +
+            (scanner.hasNext() ? scanner.next() : "(no content)"));
+      content.close();
+      entity.consumeContent();     
+      return false;
     } catch (ClientProtocolException e) {
       Log.e(TAG, "ClientProtocolException during pack upload");
       return false;

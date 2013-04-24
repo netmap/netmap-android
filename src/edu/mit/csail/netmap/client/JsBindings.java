@@ -38,8 +38,7 @@ public class JsBindings {
   }
   
   @ChromeJavascriptInterface
-  public void setReadingsUploadBackend(String url, String cookie,
-      String csrfToken) {
-    Config.setReadingsUploadBackend(url, cookie, csrfToken);
+  public void setReadingsUploadBackend(String url, String uid) {
+    Config.setReadingsUploadBackend(url, uid);
   }
 }

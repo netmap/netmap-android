@@ -126,7 +126,6 @@ public class Gps {
         } else {
           buffer.append(",{\"prn\":");
         }
-        buffer.append("{\"prn\":");
         buffer.append(satellite.getPrn());
         buffer.append(",\"used\":");
         buffer.append(satellite.usedInFix());

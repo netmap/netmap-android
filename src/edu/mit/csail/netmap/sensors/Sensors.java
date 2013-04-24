@@ -35,8 +35,8 @@ public class Sensors {
    *     formatted as a JSON string
    */
   public static void readSensors(StringBuffer jsonData) {
-    jsonData.append("{\"config\":");
-    Config.getJson(jsonData);
+    jsonData.append("{");
+    Config.getJsonFragment(jsonData);
     jsonData.append(",\"gps\":");
     Gps.getJson(jsonData);
     jsonData.append("}");
