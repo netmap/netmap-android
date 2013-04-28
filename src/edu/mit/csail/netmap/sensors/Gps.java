@@ -13,7 +13,7 @@ import android.os.Looper;
 /**
  * Information from the phone's GPS sensor.
  */
-public class Gps {
+public final class Gps {
   /** Entry point to Android's GPS functionality. */
   private static LocationManager locationManager;
   
@@ -178,7 +178,10 @@ public class Gps {
   private static class LocationStatusListener implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
-      // TODO(pwnall): report to location aggregator
+      if (!location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
+        return;
+      }
+      edu.mit.csail.netmap.sensors.Location.onLocationChanged(location);
     }
     @Override
     public void onProviderDisabled(String provider) {

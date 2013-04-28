@@ -26,7 +26,7 @@ import android.net.http.AndroidHttpClient;
 import android.util.Log;
 
 /** Queues up sensor readings so they can be uploaded over WiFi. */
-public class Recorder {
+public final class Recorder {
   /** Approximate size of a pack of readings. */
   private static final int PACK_SIZE = 128 * 1024;
   
@@ -162,20 +162,27 @@ public class Recorder {
     try {
       HttpResponse response = httpClient.execute(request);
       int statusCode = response.getStatusLine().getStatusCode();
+      
+      // Must read the response, otherwise AndroidHttpClient leaks.
+      String jsonResponse = "{}";
+      HttpEntity entity = response.getEntity();
+      if (entity != null) {
+        InputStream content = entity.getContent();
+        Scanner scanner = new Scanner(content).useDelimiter("\\A");
+        if (scanner.hasNext()) {
+          jsonResponse = scanner.next();
+        }
+        scanner.close();
+        entity.consumeContent();
+      }
+      
       if (statusCode >= 200 && statusCode < 300) {
-        response.getEntity().consumeContent();
         return true;
       }
       // TODO(pwnall): invalid JSON should be removed from the database,
       //               otherwise there will be an infinite loop
       
-      HttpEntity entity = response.getEntity();
-      InputStream content = entity.getContent();
-      Scanner scanner = new Scanner(content).useDelimiter("\\A");
-      Log.e(TAG, "Server error during pack upload: " +
-            (scanner.hasNext() ? scanner.next() : "(no content)"));
-      content.close();
-      entity.consumeContent();     
+      Log.e(TAG, "Server error during pack upload: " + jsonResponse);
       return false;
     } catch (ClientProtocolException e) {
       Log.e(TAG, "ClientProtocolException during pack upload");

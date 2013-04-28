@@ -6,7 +6,7 @@ import android.content.Context;
 /**
  * Entry point to the sensors package.
  */
-public class Sensors {
+public final class Sensors {
   /**
    * Sets up all the sensors.
    * 
@@ -23,6 +23,8 @@ public class Sensors {
     // Recorder goes right after config, so the actual sensors can use it.
     Recorder.initialize(context);
     
+    // Location goes before location sensors.
+    Location.initialize(context);
     // Sensors get initialized here.
     Gps.initialize(context);
   }
@@ -37,6 +39,8 @@ public class Sensors {
   public static void readSensors(StringBuffer jsonData) {
     jsonData.append("{");
     Config.getJsonFragment(jsonData);
+    jsonData.append(",\"location\":");
+    Location.getJson(jsonData);
     jsonData.append(",\"gps\":");
     Gps.getJson(jsonData);
     jsonData.append("}");
