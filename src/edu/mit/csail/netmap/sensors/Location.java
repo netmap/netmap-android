@@ -22,7 +22,7 @@ public final class Location {
     android.location.Location location = lastLocation; 
     
     if (location == null) {
-      buffer.append("null");
+      buffer.append("{}");
       return;
     }
     buffer.append("{\"latitude\":");
@@ -42,7 +42,8 @@ public final class Location {
       buffer.append(location.getAltitude());
     }
     if (location.hasBearing()) {
-      buffer.append(",\"bearing\":");
+      // NOTE: calling this "heading" for consistency with HTML5 Geolocation
+      buffer.append(",\"heading\":");
       buffer.append(location.getBearing());
     }
     if (location.hasSpeed()) {

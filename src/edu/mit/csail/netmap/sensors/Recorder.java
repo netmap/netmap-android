@@ -92,9 +92,9 @@ public final class Recorder {
     db_ = databaseOpenHelper.getWritableDatabase();
     
     try {
-      digestPrototype_ = MessageDigest.getInstance("SHA-1");
+      digestPrototype_ = MessageDigest.getInstance("SHA-256");
     } catch (NoSuchAlgorithmException e) {
-      Log.e(TAG, "Device does not support SHA-1");
+      Log.e(TAG, "Device does not support SHA-256");
     }
     digestCharset_ = Charset.defaultCharset();
   }
@@ -246,16 +246,16 @@ public final class Recorder {
       digest = (MessageDigest)digestPrototype_.clone();
     } catch(CloneNotSupportedException e) {
       try {
-        digest = MessageDigest.getInstance("SHA-1");
+        digest = MessageDigest.getInstance("SHA-256");
       } catch (NoSuchAlgorithmException e1) {
-        Log.e(TAG, "Device does not support SHA-1");
+        Log.e(TAG, "Device does not support SHA-256");
         return null;
       }
     }
     byte[] digestBytes = digest.digest(jsonData.getBytes(digestCharset_));
     StringBuffer hexDigest = new StringBuffer();
     for (byte b : digestBytes) {
-      String hexByte = Integer.toHexString(b);
+      String hexByte = Integer.toHexString(b & 0xff);
       if (hexByte.length() != 2) {  // hexByte will have 1 or 2 hex digits
         hexDigest.append('0');
       }

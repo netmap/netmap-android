@@ -1,11 +1,15 @@
 package edu.mit.csail.netmap.client;
 
+import us.costan.chrome.ChromeCookieManager;
 import us.costan.chrome.ChromeSettings;
 import us.costan.chrome.ChromeView;
 import android.os.Bundle;
 import android.view.Window;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 /**
  * The game's main and only activity.
@@ -13,8 +17,8 @@ import android.app.Activity;
  * All the action happens inside the WebView.
  */
 public class GameActivity extends Activity {
-  /** */
-  private ChromeView chromeView = null;
+  /** The view containing the game UI. */
+  private ChromeView webView = null;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -22,61 +26,67 @@ public class GameActivity extends Activity {
     requestWindowFeature(Window.FEATURE_NO_TITLE);
     setContentView(R.layout.activity_web);
 
-    chromeView = (ChromeView)findViewById(R.id.gameUiView);
-    setupChromeView(chromeView);
+    webView = (ChromeView)findViewById(R.id.gameUiView);
+    setupChromeView(webView);
 
     // TODO(pwnall): deploy a production server and use that URL
-    //chromeView.loadUrl("http://netmap.pwnb.us");
-    // chromeView.loadUrl("http://192.168.10.73:9200");
-    chromeView.loadUrl("http://192.168.10.73:9200/dev_mode");
-    // chromeView.loadUrl("http://128.30.5.34:9200/dev_mode");
+    webView.loadUrl("http://netmap.pwnb.us/");
+    // webView.loadUrl("http://192.168.10.73:9200");
+    // webView.loadUrl("http://128.30.5.34:9200");
   }
 
   @Override
   protected void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    chromeView.saveState(outState);
+    webView.saveState(outState);
   }
 
   @Override
   protected void onRestoreInstanceState(Bundle savedInstanceState) {
     super.onRestoreInstanceState(savedInstanceState);
-    chromeView.restoreState(savedInstanceState);
+    webView.restoreState(savedInstanceState);
   }
 
   @Override
   protected void onPause() {
-    chromeView.onPause();
+    webView.onPause();
     super.onPause();
   }
 
   @Override
   protected void onResume() {
     super.onResume();
-    chromeView.onResume();
+    webView.onResume();
   }
 
   @SuppressLint("SetJavaScriptEnabled")
   /** Configure the Chrome view for usage as the application's window. */
-  private void setupChromeView(ChromeView chromeView) {
-    ChromeSettings settings = chromeView.getSettings();
+  private void setupChromeView(ChromeView webView) {
+    ChromeSettings settings = webView.getSettings();
     settings.setJavaScriptEnabled(true);
     settings.setAllowUniversalAccessFromFileURLs(true);
     settings.setMediaPlaybackRequiresUserGesture(false);
     settings.setBuiltInZoomControls(false);
     settings.setSupportZoom(false);
     settings.setUserAgentString(settings.getUserAgentString() + " NetMap/1.0");
-
+    
+    
     // The JavaScript maps _NetMapPil to NetMap.Pil
-    chromeView.addJavascriptInterface(new JsBindings(), "_NetMapPil");
+    JsBindings jsBindings = new JsBindings(webView, this);
+    jsBindings.loadCookies();
+    webView.addJavascriptInterface(jsBindings, "_NetMapPil");
+  }
+
+  /** Saves the server's cookies, so they can be reloaded. */
+  void saveGameCookies(String gameOrigin) {
   }
 
   @Override
   /** Navigate the WebView's history when the user presses the Back key. */
   public void onBackPressed() {
-    if (chromeView != null) {
-      if (chromeView.canGoBack()) {
-        chromeView.goBack();
+    if (webView != null) {
+      if (webView.canGoBack()) {
+        webView.goBack();
       } else {
         super.onBackPressed();
       }
