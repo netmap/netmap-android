@@ -1,5 +1,6 @@
 package edu.mit.csail.netmap.client;
 
+import edu.mit.csail.netmap.sensors.Sensors;
 import us.costan.chrome.ChromeCookieManager;
 import us.costan.chrome.ChromeSettings;
 import us.costan.chrome.ChromeView;
@@ -32,7 +33,7 @@ public class GameActivity extends Activity {
     // TODO(pwnall): deploy a production server and use that URL
     webView.loadUrl("http://netmap.pwnb.us/");
     // webView.loadUrl("http://192.168.10.73:9200");
-    // webView.loadUrl("http://128.30.5.34:9200");
+    // webView.loadUrl("http://128.30.5.68:9200");
   }
 
   @Override
@@ -75,6 +76,7 @@ public class GameActivity extends Activity {
     JsBindings jsBindings = new JsBindings(webView, this);
     jsBindings.loadCookies();
     webView.addJavascriptInterface(jsBindings, "_NetMapPil");
+    Sensors.setEventClient(jsBindings);
   }
 
   /** Saves the server's cookies, so they can be reloaded. */

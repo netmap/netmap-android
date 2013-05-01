@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import edu.mit.csail.netmap.sensors.Config;
 import edu.mit.csail.netmap.sensors.GSM;
+import edu.mit.csail.netmap.sensors.EventClient;
 import edu.mit.csail.netmap.sensors.Gps;
 import edu.mit.csail.netmap.sensors.Location;
 import edu.mit.csail.netmap.sensors.Recorder;
@@ -15,7 +16,7 @@ import us.costan.chrome.ChromeView;
 import us.costan.chrome.ChromeCookieManager;
 
 /** The bindings available as the "NetMap.Pil" object. */
-public class JsBindings {
+public class JsBindings implements EventClient {
   /** The WebView using these bindings. */
   private final ChromeView webView;
   /** The activity that contains the WebView using these bindings. */
@@ -32,16 +33,12 @@ public class JsBindings {
   
   @ChromeJavascriptInterface
   public void locationOn() {
-    Gps.start();
-    WiFi.start();
-    GSM.start();
+    Location.on();
   }
   
   @ChromeJavascriptInterface
   public void locationOff() {
-    Gps.stop();
-    WiFi.stop();
-    GSM.stop();
+    Location.off();
   }
   
   @ChromeJavascriptInterface
@@ -54,8 +51,9 @@ public class JsBindings {
   @ChromeJavascriptInterface
   public void startReading(final String measurements,
                            final String callbackName) {
+    // TODO: measure
     StringBuffer jsonData = new StringBuffer(); 
-    Sensors.readSensors(jsonData);
+    Sensors.readSensors(measurements, jsonData);
     final String digest = Recorder.storeReading(jsonData.toString());
     
     activity.runOnUiThread(new Runnable() {
@@ -68,6 +66,7 @@ public class JsBindings {
   
   @ChromeJavascriptInterface
   public void uploadReadingPack(final String callbackName) {
+    // TODO: uploadPack
     boolean done = Recorder.uploadReadingPack();
     final String doneString = done ? "true" : "false";
     activity.runOnUiThread(new Runnable() {
@@ -80,6 +79,7 @@ public class JsBindings {
   
   @ChromeJavascriptInterface
   public void setReadingsUploadBackend(String url, String uid) {
+    // TODO: setBackend
     Config.setReadingsUploadBackend(url, uid);
   }
   
@@ -94,10 +94,20 @@ public class JsBindings {
     editor.commit();    
   }
   
+  /** Called by GameActivity to load saveCookie's cookies into the WebView. **/
   public void loadCookies() {
     ChromeCookieManager cookies = ChromeCookieManager.getInstance();
     String origin = preferences.getString("origin", "http://netmap.pwnb.us");
     String cookie = preferences.getString("cookies", ""); 
     cookies.setCookie(origin, cookie);
+  }
+  
+  @Override
+  public void onLocation() {
+    activity.runOnUiThread(new Runnable() {
+      public void run() {
+        webView.loadUrl("javascript:_pil_ev.location()");
+      }
+    });
   }
 }

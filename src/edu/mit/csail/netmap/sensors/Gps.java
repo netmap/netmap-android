@@ -178,9 +178,9 @@ public final class Gps {
   private static class LocationStatusListener implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
-      if (!location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
-        return;
-      }
+      //if (!location.getProvider().equals(LocationManager.GPS_PROVIDER)) {
+      //  return;
+      //}
       edu.mit.csail.netmap.sensors.Location.onLocationChanged(location);
     }
     @Override
