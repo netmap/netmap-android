@@ -27,6 +27,8 @@ public final class Sensors {
     Location.initialize(context);
     // Sensors get initialized here.
     Gps.initialize(context);
+    WiFi.initialize(context);
+    GSM.initialize(context);
   }
   private static boolean initialized = false;
   
@@ -43,6 +45,11 @@ public final class Sensors {
     Location.getJson(jsonData);
     jsonData.append(",\"gps\":");
     Gps.getJson(jsonData);
+    jsonData.append(",\"wifi\":");
+    WiFi.getJson(jsonData);
+    jsonData.append(",\"gsm\":");
+    GSM.getJson(jsonData);
+    
     jsonData.append("}");
   }
 }

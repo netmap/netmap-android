@@ -4,10 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import edu.mit.csail.netmap.sensors.Config;
+import edu.mit.csail.netmap.sensors.GSM;
 import edu.mit.csail.netmap.sensors.Gps;
 import edu.mit.csail.netmap.sensors.Location;
 import edu.mit.csail.netmap.sensors.Recorder;
 import edu.mit.csail.netmap.sensors.Sensors;
+import edu.mit.csail.netmap.sensors.WiFi;
 import us.costan.chrome.ChromeJavascriptInterface;
 import us.costan.chrome.ChromeView;
 import us.costan.chrome.ChromeCookieManager;
@@ -31,11 +33,15 @@ public class JsBindings {
   @ChromeJavascriptInterface
   public void locationOn() {
     Gps.start();
+    WiFi.start();
+    GSM.start();
   }
   
   @ChromeJavascriptInterface
   public void locationOff() {
     Gps.stop();
+    WiFi.stop();
+    GSM.stop();
   }
   
   @ChromeJavascriptInterface
