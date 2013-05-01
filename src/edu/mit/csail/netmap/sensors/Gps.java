@@ -102,7 +102,7 @@ public final class Gps {
    */
   public static void getJson(StringBuffer buffer) {
     buffer.append("{\"enabled\":");
-    if (enabled) { buffer.append("true"); } else { buffer.append("false"); }
+    buffer.append(enabled ? "true" : "false");
     if (started) {
       buffer.append(",\"started\": true");
     }

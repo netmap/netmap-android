@@ -14,6 +14,8 @@ public final class GSM {
   /** Entry point to Android's GSM functionality. */
   private static TelephonyManager telephonyManager;
   
+  private static StateListener stateListener;  
+  
   private static int connectedTowerRSSI = 0;
   private static int connectedTowerBER = 0;
   
@@ -34,6 +36,7 @@ public final class GSM {
   public static void initialize(Context context) {
     telephonyManager = 
       (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+    stateListener = new StateListener();
   }
   
   /**
@@ -43,7 +46,9 @@ public final class GSM {
    */
   public static void start() {
     if (listening) return;
-    telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS | PhoneStateListener.LISTEN_CELL_LOCATION);
+    telephonyManager.listen(stateListener,
+        PhoneStateListener.LISTEN_SIGNAL_STRENGTHS |
+        PhoneStateListener.LISTEN_CELL_LOCATION);
     neighboringCells = telephonyManager.getNeighboringCellInfo();
     gsmCell = (GsmCellLocation)telephonyManager.getCellLocation(); 
     
@@ -58,7 +63,7 @@ public final class GSM {
    */
   public static void stop() {
     if (!listening) return;
-    telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+    telephonyManager.listen(stateListener, PhoneStateListener.LISTEN_NONE);
     listening = false;
   }
   
@@ -84,7 +89,7 @@ public final class GSM {
       buffer.append(",\"started\": true");
     }**/    
     
-    if (gsmCell != null){
+    if (gsmCell != null) {
       buffer.append(",\"type\":");
       buffer.append(telephonyManager.getNetworkType());
       buffer.append(",\"cid\":");
@@ -98,7 +103,7 @@ public final class GSM {
     }
     
     
-    if (neighboringCells != null){
+    if (neighboringCells != null) {
       buffer.append(",\"numOfCells\":");
       buffer.append(neighboringCells.size());
       buffer.append(",\"cells\":[");
@@ -128,19 +133,14 @@ public final class GSM {
     
   }
   
-   
-  private static PhoneStateListener phoneStateListener = new PhoneStateListener()
-  {
-    public void  onSignalStrengthsChanged(SignalStrength ss)
-    {
+  
+  private static class StateListener extends PhoneStateListener {
+    public void onSignalStrengthsChanged(SignalStrength ss) {
       connectedTowerRSSI = ss.getGsmSignalStrength();
       connectedTowerBER = ss.getGsmBitErrorRate();
     }
     
-    public void  onCellLocationChanged  (CellLocation location)
-    {
+    public void onCellLocationChanged(CellLocation location) {
     }
   };
-  
-
 }

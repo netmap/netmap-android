@@ -93,6 +93,8 @@ public final class Location {
   
   public static void off() {
     Gps.stop();
+    WiFi.stop();
+    GSM.stop();
   }
   
   /**

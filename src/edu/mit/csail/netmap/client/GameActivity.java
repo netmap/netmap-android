@@ -1,16 +1,12 @@
 package edu.mit.csail.netmap.client;
 
 import edu.mit.csail.netmap.sensors.Sensors;
-import us.costan.chrome.ChromeCookieManager;
 import us.costan.chrome.ChromeSettings;
 import us.costan.chrome.ChromeView;
 import android.os.Bundle;
 import android.view.Window;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 
 /**
  * The game's main and only activity.
@@ -32,6 +28,7 @@ public class GameActivity extends Activity {
 
     // TODO(pwnall): deploy a production server and use that URL
     webView.loadUrl("http://netmap.pwnb.us/");
+    // webView.loadUrl("http://192.168.10.71:9200");
     // webView.loadUrl("http://192.168.10.73:9200");
     // webView.loadUrl("http://128.30.5.68:9200");
   }
