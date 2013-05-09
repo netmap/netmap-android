@@ -39,8 +39,6 @@ public final class WiFi {
   /** True when listening for WiFi updates. */
   private static boolean listening = false;
   
-  private static Context context;
-  
   /** Called by {@link Sensors#initialize(android.content.Context)}. */
   public static void initialize(Context context) {
     wifiManager = 
@@ -81,7 +79,6 @@ public final class WiFi {
    */
   public static void stop() {
     if (!listening) return;
-    context.unregisterReceiver(scanResultReceiver);
     wifiLock.release();
     wifiLock = null;
     listening = false;
