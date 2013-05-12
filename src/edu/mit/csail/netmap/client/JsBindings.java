@@ -7,8 +7,7 @@ import edu.mit.csail.netmap.sensors.Config;
 import edu.mit.csail.netmap.sensors.EventClient;
 import edu.mit.csail.netmap.sensors.Location;
 import edu.mit.csail.netmap.sensors.MeasureCallback;
-import edu.mit.csail.netmap.sensors.Recorder;
-import edu.mit.csail.netmap.sensors.Sensors;
+import edu.mit.csail.netmap.sensors.NetMap;
 import us.costan.chrome.ChromeJavascriptInterface;
 import us.costan.chrome.ChromeView;
 import us.costan.chrome.ChromeCookieManager;
@@ -49,7 +48,7 @@ public class JsBindings implements EventClient {
   @ChromeJavascriptInterface
   public void startReading(final String measurements,
                            final String callbackName) {
-    Sensors.measureAsync(measurements, new MeasureCallback() {
+    NetMap.measureAsync(measurements, new MeasureCallback() {
       @Override
       public void done(final String digest) {
         activity.runOnUiThread(new Runnable() {
@@ -65,7 +64,7 @@ public class JsBindings implements EventClient {
   @ChromeJavascriptInterface
   public void uploadReadingPack(final String callbackName) {
     // TODO: uploadPack
-    boolean done = Recorder.uploadReadingPack();
+    boolean done = NetMap.upload();
     final String doneString = done ? "true" : "false";
     activity.runOnUiThread(new Runnable() {
       public void run() {

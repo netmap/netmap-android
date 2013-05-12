@@ -30,7 +30,7 @@ public class GameActivity extends Activity {
     webView.loadUrl("http://netmap.pwnb.us/");
     // webView.loadUrl("http://192.168.10.71:9200");
     // webView.loadUrl("http://192.168.10.73:9200");
-    // webView.loadUrl("http://128.30.5.68:9200");
+    // webView.loadUrl("http://128.30.6.205:9200");
   }
 
   @Override
