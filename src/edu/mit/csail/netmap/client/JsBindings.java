@@ -6,6 +6,7 @@ import android.content.SharedPreferences.Editor;
 import edu.mit.csail.netmap.sensors.Config;
 import edu.mit.csail.netmap.sensors.EventClient;
 import edu.mit.csail.netmap.sensors.Location;
+import edu.mit.csail.netmap.sensors.MeasureCallback;
 import edu.mit.csail.netmap.sensors.Recorder;
 import edu.mit.csail.netmap.sensors.Sensors;
 import us.costan.chrome.ChromeJavascriptInterface;
@@ -48,15 +49,15 @@ public class JsBindings implements EventClient {
   @ChromeJavascriptInterface
   public void startReading(final String measurements,
                            final String callbackName) {
-    // TODO: measure
-    StringBuffer jsonData = new StringBuffer(); 
-    Sensors.readSensors(measurements, jsonData);
-    final String digest = Recorder.storeReading(jsonData.toString());
-    
-    activity.runOnUiThread(new Runnable() {
-      public void run() {
-        webView.loadUrl("javascript:_pil_cb." + callbackName +
-                        "(\"" + digest + "\")");
+    Sensors.measureAsync(measurements, new MeasureCallback() {
+      @Override
+      public void done(final String digest) {
+        activity.runOnUiThread(new Runnable() {
+          public void run() {
+            webView.loadUrl("javascript:_pil_cb." + callbackName +
+                            "(\"" + digest + "\")");
+          }
+        });        
       }
     });
   }
