@@ -28,18 +28,23 @@ public class JsBindings implements NetMapListener {
   }
   
   @ChromeJavascriptInterface
-  public void locationOn() {
+  public void trackLocation(boolean enabled) {
     NetMap.trackLocation(true);
-  }
-  
-  @ChromeJavascriptInterface
-  public void locationOff() {
-    NetMap.trackLocation(false);
   }
   
   @ChromeJavascriptInterface
   public String locationJson() {
     return NetMap.locationJson();
+  }
+
+  @ChromeJavascriptInterface
+  public String powerSourceJson() {
+    return NetMap.powerSourceJson();
+  }
+  
+  @ChromeJavascriptInterface
+  public String networkSourceJson() {
+    return NetMap.networkSourceJson();
   }
   
   @ChromeJavascriptInterface
@@ -104,6 +109,24 @@ public class JsBindings implements NetMapListener {
     activity.runOnUiThread(new Runnable() {
       public void run() {
         webView.loadUrl("javascript:_pil_ev.location()");
+      }
+    });
+  }
+
+  @Override
+  public void onBattery() {
+    activity.runOnUiThread(new Runnable() {
+      public void run() {
+        webView.loadUrl("javascript:_pil_ev.power()");
+      }
+    });
+  }
+
+  @Override
+  public void onNetwork() {
+    activity.runOnUiThread(new Runnable() {
+      public void run() {
+        webView.loadUrl("javascript:_pil_ev.network()");
       }
     });
   }
