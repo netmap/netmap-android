@@ -1,6 +1,6 @@
 package edu.mit.csail.netmap.client;
 
-import edu.mit.csail.netmap.sensors.Sensors;
+import edu.mit.csail.netmap.NetMap;
 import us.costan.chrome.ChromeSettings;
 import us.costan.chrome.ChromeView;
 import android.os.Bundle;
@@ -73,7 +73,7 @@ public class GameActivity extends Activity {
     JsBindings jsBindings = new JsBindings(webView, this);
     jsBindings.loadCookies();
     webView.addJavascriptInterface(jsBindings, "_NetMapPil");
-    Sensors.setEventClient(jsBindings);
+    NetMap.setListener(jsBindings);
   }
 
   /** Saves the server's cookies, so they can be reloaded. */

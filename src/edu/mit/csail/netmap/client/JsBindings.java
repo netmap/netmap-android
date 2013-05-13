@@ -3,17 +3,16 @@ package edu.mit.csail.netmap.client;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import edu.mit.csail.netmap.sensors.EventClient;
-import edu.mit.csail.netmap.sensors.Location;
-import edu.mit.csail.netmap.sensors.MeasureCallback;
-import edu.mit.csail.netmap.sensors.NetMap;
-import edu.mit.csail.netmap.sensors.UploadCallback;
+import edu.mit.csail.netmap.NetMapListener;
+import edu.mit.csail.netmap.MeasureCallback;
+import edu.mit.csail.netmap.NetMap;
+import edu.mit.csail.netmap.UploadCallback;
 import us.costan.chrome.ChromeJavascriptInterface;
 import us.costan.chrome.ChromeView;
 import us.costan.chrome.ChromeCookieManager;
 
 /** The bindings available as the "NetMap.Pil" object. */
-public class JsBindings implements EventClient {
+public class JsBindings implements NetMapListener {
   /** The WebView using these bindings. */
   private final ChromeView webView;
   /** The activity that contains the WebView using these bindings. */
@@ -30,19 +29,17 @@ public class JsBindings implements EventClient {
   
   @ChromeJavascriptInterface
   public void locationOn() {
-    Location.on();
+    NetMap.trackLocation(true);
   }
   
   @ChromeJavascriptInterface
   public void locationOff() {
-    Location.off();
+    NetMap.trackLocation(false);
   }
   
   @ChromeJavascriptInterface
   public String locationJson() {
-    StringBuffer buffer = new StringBuffer();
-    Location.getJson(buffer);
-    return buffer.toString();
+    return NetMap.locationJson();
   }
   
   @ChromeJavascriptInterface
