@@ -3,11 +3,11 @@ package edu.mit.csail.netmap.client;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import edu.mit.csail.netmap.sensors.Config;
 import edu.mit.csail.netmap.sensors.EventClient;
 import edu.mit.csail.netmap.sensors.Location;
 import edu.mit.csail.netmap.sensors.MeasureCallback;
 import edu.mit.csail.netmap.sensors.NetMap;
+import edu.mit.csail.netmap.sensors.UploadCallback;
 import us.costan.chrome.ChromeJavascriptInterface;
 import us.costan.chrome.ChromeView;
 import us.costan.chrome.ChromeCookieManager;
@@ -63,21 +63,24 @@ public class JsBindings implements EventClient {
   
   @ChromeJavascriptInterface
   public void uploadReadingPack(final String callbackName) {
-    // TODO: uploadPack
-    boolean done = NetMap.upload();
-    final String doneString = done ? "true" : "false";
-    activity.runOnUiThread(new Runnable() {
-      public void run() {
-        webView.loadUrl("javascript:_pil_cb." + callbackName +
-                        "(" + doneString + ")");
+    NetMap.uploadAsync(new UploadCallback() {
+      @Override
+      public void done(final boolean stillHasData) {
+        boolean done = NetMap.upload();
+        final String doneString = done ? "true" : "false";
+        activity.runOnUiThread(new Runnable() {
+          public void run() {
+            webView.loadUrl("javascript:_pil_cb." + callbackName +
+                            "(" + doneString + ")");
+          }
+        });
       }
     });
   }
   
   @ChromeJavascriptInterface
   public void setReadingsUploadBackend(String url, String uid) {
-    // TODO: setBackend
-    Config.setReadingsUploadBackend(url, uid);
+    NetMap.configure(uid, url);
   }
   
   @ChromeJavascriptInterface
