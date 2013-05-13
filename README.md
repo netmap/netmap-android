@@ -1,6 +1,6 @@
 # NetMap Game Client for Android
 
-This repository contains the code for the NetMap android client.
+This repository contains the code for the NetMap Android client.
 
 
 ## Setup
@@ -56,14 +56,23 @@ The steps below
     git clone git://github.com/pwnall/chromeview.git
     ```
 
-2. Clone this repository in your Eclipse workspace.
+2. Clone [the NetMap measurements repository](https://github.com/netmap/netmap-metrics) in
+   your Eclipse workspace.
+
+    ```bash
+    cd ~/workspace
+    git clone git@github.com:netmap/netmap-metrics.git
+    ```
+
+
+3. Clone this repository in your Eclipse workspace.
 
     ```bash
     cd ~/workspace
     git clone git@github.com:netmap/netmap-android.git
     ```
 
-3. Import the projects into Eclipse.
+4. Import the projects into Eclipse.
 
     * Go to the Eclipse menu, and select `File` > `Import`
     * Select `General` > `Existing Projects into Workspace`.
