@@ -68,12 +68,11 @@ public class JsBindings implements NetMapListener {
     NetMap.uploadAsync(new UploadCallback() {
       @Override
       public void done(final boolean stillHasData) {
-        boolean done = NetMap.upload();
-        final String doneString = done ? "true" : "false";
+        final String doneString = stillHasData ? "repeat" : "done";
         activity.runOnUiThread(new Runnable() {
           public void run() {
             webView.loadUrl("javascript:_pil_cb." + callbackName +
-                            "(" + doneString + ")");
+                            "(\"" + doneString + "\")");
           }
         });
       }
