@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.Window;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.res.Configuration;
 
 /**
  * The game's main and only activity.

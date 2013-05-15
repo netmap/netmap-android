@@ -29,7 +29,7 @@ public class JsBindings implements NetMapListener {
   
   @ChromeJavascriptInterface
   public void trackLocation(boolean enabled) {
-    NetMap.trackLocation(true);
+    NetMap.trackLocation(enabled);
   }
   
   @ChromeJavascriptInterface
