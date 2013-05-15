@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.Window;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.res.Configuration;
 
 /**
  * The game's main and only activity.
@@ -26,11 +27,12 @@ public class GameActivity extends Activity {
     webView = (ChromeView)findViewById(R.id.gameUiView);
     setupChromeView(webView);
 
-    // TODO(pwnall): deploy a production server and use that URL
-    webView.loadUrl("http://netmap.pwnb.us/");
-    // webView.loadUrl("http://192.168.10.71:9200");
-    // webView.loadUrl("http://192.168.10.73:9200");
-    // webView.loadUrl("http://128.30.6.205:9200");
+    if (savedInstanceState == null) {
+      webView.loadUrl("http://netmap.pwnb.us/");
+      // webView.loadUrl("http://192.168.10.71:9200");
+      // webView.loadUrl("http://192.168.10.73:9200");
+      // webView.loadUrl("http://128.30.6.205:9200");
+    }
   }
 
   @Override
